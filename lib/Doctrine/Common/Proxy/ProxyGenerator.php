@@ -411,6 +411,7 @@ EOT;
      * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata $class
      *
      * @return string
+     * @throws \ReflectionException
      */
     private function generateMagicGet(ClassMetadata $class)
     {
@@ -434,12 +435,7 @@ EOT;
         }
 
 		$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($class->getReflectionClass(), '__get', 'name');
-
-		try {
-			$returnTypeHint = $this->getMethodReturnType($class->getReflectionClass()->getMethod('__get'));
-		} catch (\ReflectionException $e) {
-			$returnTypeHint = null;
-		}
+		$returnTypeHint = $this->getMethodReturnType($class->getReflectionClass()->getMethod('__get'));
 
 		$magicGet = <<<EOT
     /**
@@ -488,6 +484,7 @@ EOT;
      * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata $class
      *
      * @return string
+     * @throws \ReflectionException
      */
     private function generateMagicSet(ClassMetadata $class)
     {
@@ -500,12 +497,7 @@ EOT;
 
 		$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($class->getReflectionClass(), '__isset', 'name');
 		$valueParameterTypeHint = $this->getMethodParameterTypeHintByReflection($class->getReflectionClass(), '__isset', 'value');
-
-		try {
-			$returnTypeHint = $this->getMethodReturnType($class->getReflectionClass()->getMethod('__isset'));
-		} catch (\ReflectionException $e) {
-			$returnTypeHint = null;
-		}
+		$returnTypeHint = $this->getMethodReturnType($class->getReflectionClass()->getMethod('__isset'));
 
 		$inheritDoc = $hasParentSet ? '{@inheritDoc}' : '';
 		$magicSet   = <<<EOT
@@ -554,6 +546,7 @@ EOT;
      * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata $class
      *
      * @return string
+     * @throws \ReflectionException
      */
     private function generateMagicIsset(ClassMetadata $class)
     {
@@ -566,12 +559,7 @@ EOT;
 
         $inheritDoc = $hasParentIsset ? '{@inheritDoc}' : '';
 		$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($class->getReflectionClass(), '__isset', 'name');
-
-		try {
-			$returnTypeHint = $this->getMethodReturnType($class->getReflectionClass()->getMethod('__isset'));
-		} catch (\ReflectionException $e) {
-			$returnTypeHint = null;
-		}
+		$returnTypeHint = $this->getMethodReturnType($class->getReflectionClass()->getMethod('__isset'));
 
 		$magicIsset = <<<EOT
     /**
@@ -991,16 +979,13 @@ EOT;
 	 * @param string $parameter
 	 *
 	 * @return string|null
+	 * @throws \ReflectionException
 	 */
 	private function getMethodParameterTypeHintByReflection(\ReflectionClass $reflection, string $method, string $parameter)
 	{
-		try {
-			$typeHint = $this->getParameterTypeByMethod($reflection->getMethod($method), $parameter);
+		$typeHint = $this->getParameterTypeByMethod($reflection->getMethod($method), $parameter);
 
-			return $typeHint ? $typeHint . ' ' : null;
-		} catch (\ReflectionException $e) {
-			return null;
-		}
+		return $typeHint ? $typeHint . ' ' : null;
 	}
 
     /**
