@@ -496,9 +496,9 @@ EOT;
         $hasParentSet         = $reflectionClass->hasMethod('__set');
 
 		if ($hasParentSet) {
-			$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($reflectionClass, '__isset', 'name');
-			$valueParameterTypeHint = $this->getMethodParameterTypeHintByReflection($reflectionClass, '__isset', 'value');
-			$returnTypeHint = $this->getMethodReturnType($reflectionClass->getMethod('__isset'));
+			$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($reflectionClass, '__set', 'name');
+			$valueParameterTypeHint = $this->getMethodParameterTypeHintByReflection($reflectionClass, '__set', 'value');
+			$returnTypeHint = $this->getMethodReturnType($reflectionClass->getMethod('__set'));
 		} else {
 			$nameParameterTypeHint = null;
 			$valueParameterTypeHint = null;
