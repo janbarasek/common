@@ -433,7 +433,18 @@ EOT;
             return '';
         }
 
-        $magicGet = <<<EOT
+		if (PHP_VERSION_ID >= 70000) {
+			$magicGet = <<<EOT
+    /**
+     * $inheritDoc
+     * @param string \$name
+     */
+    public function {$returnReference}__get(string \$name)
+    {
+
+EOT;
+		} else{
+			$magicGet = <<<EOT
     /**
      * $inheritDoc
      * @param string \$name
@@ -442,6 +453,7 @@ EOT;
     {
 
 EOT;
+		}
 
         if ( ! empty($lazyPublicProperties)) {
             $magicGet .= <<<'EOT'
@@ -491,7 +503,20 @@ EOT;
         }
 
         $inheritDoc = $hasParentSet ? '{@inheritDoc}' : '';
-        $magicSet   = <<<EOT
+		if (PHP_VERSION_ID >= 70000) {
+			$magicSet   = <<<EOT
+    /**
+     * $inheritDoc
+     * @param string \$name
+     * @param mixed  \$value
+     * @return void
+     */
+    public function __set(string \$name, \$value)
+    {
+
+EOT;
+		} else {
+			$magicSet   = <<<EOT
     /**
      * $inheritDoc
      * @param string \$name
@@ -501,6 +526,7 @@ EOT;
     {
 
 EOT;
+		}
 
         if ( ! empty($lazyPublicProperties)) {
             $magicSet .= <<<'EOT'
@@ -548,7 +574,19 @@ EOT;
         }
 
         $inheritDoc = $hasParentIsset ? '{@inheritDoc}' : '';
-        $magicIsset = <<<EOT
+        if (PHP_VERSION_ID >= 70000){
+			$magicIsset = <<<EOT
+    /**
+     * $inheritDoc
+     * @param  string \$name
+     * @return boolean
+     */
+    public function __isset(string \$name): bool
+    {
+
+EOT;
+		} else {
+			$magicIsset = <<<EOT
     /**
      * $inheritDoc
      * @param  string \$name
@@ -558,6 +596,7 @@ EOT;
     {
 
 EOT;
+		}
 
         if ( ! empty($lazyPublicProperties)) {
             $magicIsset .= <<<'EOT'
