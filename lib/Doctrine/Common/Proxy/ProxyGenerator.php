@@ -433,27 +433,23 @@ EOT;
             return '';
         }
 
-		if (PHP_VERSION_ID >= 70000) {
-			$magicGet = <<<EOT
-    /**
-     * $inheritDoc
-     * @param string \$name
-     */
-    public function {$returnReference}__get(string \$name)
-    {
+		$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($class->getReflectionClass(), '__get', 'name');
 
-EOT;
-		} else{
-			$magicGet = <<<EOT
-    /**
-     * $inheritDoc
-     * @param string \$name
-     */
-    public function {$returnReference}__get(\$name)
-    {
-
-EOT;
+		try {
+			$returnTypeHint = $this->getMethodReturnType($class->getReflectionClass()->getMethod('__get'));
+		} catch (\ReflectionException $e) {
+			$returnTypeHint = null;
 		}
+
+		$magicGet = <<<EOT
+    /**
+     * $inheritDoc
+     * @param string \$name
+     */
+    public function {$returnReference}__get($nameParameterTypeHint\$name)$returnTypeHint
+    {
+
+EOT;
 
         if ( ! empty($lazyPublicProperties)) {
             $magicGet .= <<<'EOT'
@@ -502,31 +498,26 @@ EOT;
             return '';
         }
 
-        $inheritDoc = $hasParentSet ? '{@inheritDoc}' : '';
-		if (PHP_VERSION_ID >= 70000) {
-			$magicSet   = <<<EOT
-    /**
-     * $inheritDoc
-     * @param string \$name
-     * @param mixed  \$value
-     * @return void
-     */
-    public function __set(string \$name, \$value)
-    {
+		$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($class->getReflectionClass(), '__isset', 'name');
+		$valueParameterTypeHint = $this->getMethodParameterTypeHintByReflection($class->getReflectionClass(), '__isset', 'value');
 
-EOT;
-		} else {
-			$magicSet   = <<<EOT
-    /**
-     * $inheritDoc
-     * @param string \$name
-     * @param mixed  \$value
-     */
-    public function __set(\$name, \$value)
-    {
-
-EOT;
+		try {
+			$returnTypeHint = $this->getMethodReturnType($class->getReflectionClass()->getMethod('__isset'));
+		} catch (\ReflectionException $e) {
+			$returnTypeHint = null;
 		}
+
+		$inheritDoc = $hasParentSet ? '{@inheritDoc}' : '';
+		$magicSet   = <<<EOT
+    /**
+     * $inheritDoc
+     * @param string \$name
+     * @param mixed  \$value
+     */
+    public function __set($nameParameterTypeHint\$name, $valueParameterTypeHint\$value)$returnTypeHint
+    {
+
+EOT;
 
         if ( ! empty($lazyPublicProperties)) {
             $magicSet .= <<<'EOT'
@@ -574,29 +565,24 @@ EOT;
         }
 
         $inheritDoc = $hasParentIsset ? '{@inheritDoc}' : '';
-        if (PHP_VERSION_ID >= 70000){
-			$magicIsset = <<<EOT
-    /**
-     * $inheritDoc
-     * @param  string \$name
-     * @return boolean
-     */
-    public function __isset(string \$name): bool
-    {
+		$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($class->getReflectionClass(), '__isset', 'name');
 
-EOT;
-		} else {
-			$magicIsset = <<<EOT
-    /**
-     * $inheritDoc
-     * @param  string \$name
-     * @return boolean
-     */
-    public function __isset(\$name)
-    {
-
-EOT;
+		try {
+			$returnTypeHint = $this->getMethodReturnType($class->getReflectionClass()->getMethod('__isset'));
+		} catch (\ReflectionException $e) {
+			$returnTypeHint = null;
 		}
+
+		$magicIsset = <<<EOT
+    /**
+     * $inheritDoc
+     * @param  string \$name
+     * @return boolean
+     */
+    public function __isset($nameParameterTypeHint\$name)$returnTypeHint
+    {
+
+EOT;
 
         if ( ! empty($lazyPublicProperties)) {
             $magicIsset .= <<<'EOT'
@@ -981,6 +967,41 @@ EOT;
 
         return $this->formatType($parameter->getType(), $parameter->getDeclaringFunction(), $parameter);
     }
+
+	/**
+	 * @param \ReflectionMethod $method
+	 * @param string $parameterName
+	 *
+	 * @return string|null
+	 */
+    private function getParameterTypeByMethod(\ReflectionMethod $method, string $parameterName)
+	{
+		foreach ($method->getParameters() as $parameter) {
+			if ($parameter->getName() === $parameterName) {
+				return $this->getParameterType($parameter);
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param \ReflectionClass $reflection
+	 * @param string $method
+	 * @param string $parameter
+	 *
+	 * @return string|null
+	 */
+	private function getMethodParameterTypeHintByReflection(\ReflectionClass $reflection, string $method, string $parameter)
+	{
+		try {
+			$typeHint = $this->getParameterTypeByMethod($reflection->getMethod($method), $parameter);
+
+			return $typeHint ? $typeHint . ' ' : null;
+		} catch (\ReflectionException $e) {
+			return null;
+		}
+	}
 
     /**
      * @param \ReflectionParameter[] $parameters
