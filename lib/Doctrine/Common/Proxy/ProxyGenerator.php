@@ -428,14 +428,17 @@ EOT;
             if ($reflectionClass->getMethod('__get')->returnsReference()) {
                 $returnReference = '& ';
             }
-        }
+
+			$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($reflectionClass, '__get', 'name');
+			$returnTypeHint = $this->getMethodReturnType($reflectionClass->getMethod('__get'));
+        } else {
+			$nameParameterTypeHint = null;
+			$returnTypeHint = null;
+		}
 
         if (empty($lazyPublicProperties) && ! $hasParentGet) {
             return '';
         }
-
-		$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($class->getReflectionClass(), '__get', 'name');
-		$returnTypeHint = $this->getMethodReturnType($class->getReflectionClass()->getMethod('__get'));
 
 		$magicGet = <<<EOT
     /**
@@ -489,15 +492,22 @@ EOT;
     private function generateMagicSet(ClassMetadata $class)
     {
         $lazyPublicProperties = $this->getLazyLoadedPublicProperties($class);
-        $hasParentSet         = $class->getReflectionClass()->hasMethod('__set');
+		$reflectionClass      = $class->getReflectionClass();
+        $hasParentSet         = $reflectionClass->hasMethod('__set');
+
+		if ($hasParentSet) {
+			$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($reflectionClass, '__isset', 'name');
+			$valueParameterTypeHint = $this->getMethodParameterTypeHintByReflection($reflectionClass, '__isset', 'value');
+			$returnTypeHint = $this->getMethodReturnType($reflectionClass->getMethod('__isset'));
+		} else {
+			$nameParameterTypeHint = null;
+			$valueParameterTypeHint = null;
+			$returnTypeHint = null;
+		}
 
         if (empty($lazyPublicProperties) && ! $hasParentSet) {
             return '';
         }
-
-		$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($class->getReflectionClass(), '__isset', 'name');
-		$valueParameterTypeHint = $this->getMethodParameterTypeHintByReflection($class->getReflectionClass(), '__isset', 'value');
-		$returnTypeHint = $this->getMethodReturnType($class->getReflectionClass()->getMethod('__isset'));
 
 		$inheritDoc = $hasParentSet ? '{@inheritDoc}' : '';
 		$magicSet   = <<<EOT
@@ -551,15 +561,22 @@ EOT;
     private function generateMagicIsset(ClassMetadata $class)
     {
         $lazyPublicProperties = array_keys($this->getLazyLoadedPublicProperties($class));
-        $hasParentIsset       = $class->getReflectionClass()->hasMethod('__isset');
+		$reflectionClass      = $class->getReflectionClass();
+        $hasParentIsset       = $reflectionClass->hasMethod('__isset');
+
+		if ($hasParentIsset) {
+			$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($reflectionClass, '__isset', 'name');
+			$returnTypeHint = $this->getMethodReturnType($reflectionClass->getMethod('__isset'));
+		} else {
+			$nameParameterTypeHint = null;
+			$returnTypeHint = null;
+		}
 
         if (empty($lazyPublicProperties) && ! $hasParentIsset) {
             return '';
         }
 
         $inheritDoc = $hasParentIsset ? '{@inheritDoc}' : '';
-		$nameParameterTypeHint = $this->getMethodParameterTypeHintByReflection($class->getReflectionClass(), '__isset', 'name');
-		$returnTypeHint = $this->getMethodReturnType($class->getReflectionClass()->getMethod('__isset'));
 
 		$magicIsset = <<<EOT
     /**
