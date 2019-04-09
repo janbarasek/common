@@ -29,7 +29,7 @@ class MagicSetClassWithScalarType
 	 *
 	 * @throws \BadMethodCallException
 	 */
-	public function __set(string $name, $value): void
+	public function __set(string $name, $value)
 	{
 		if ($name === 'test') {
 			$this->testAttribute = $value;
