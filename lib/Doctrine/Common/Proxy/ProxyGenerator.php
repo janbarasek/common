@@ -420,7 +420,7 @@ EOT;
         $hasParentGet         = false;
         $returnReference      = '';
         $inheritDoc           = '';
-        $parametersBuffer     = '';
+        $parametersBuffer     = '$name';
         $returnTypeHint       = null;
 
         if ($reflectionClass->hasMethod('__get')) {
@@ -433,7 +433,7 @@ EOT;
             }
 
             $parametersBuffer = $this->getMethodParametersWithTypes($methodReflection);
-            $returnTypeHint = $this->getMethodReturnType($reflectionClass->getMethod('__get'));
+            $returnTypeHint = $this->getMethodReturnType($methodReflection);
         }
 
         if (empty($lazyPublicProperties) && ! $hasParentGet) {
@@ -494,14 +494,14 @@ EOT;
         $lazyPublicProperties = $this->getLazyLoadedPublicProperties($class);
         $reflectionClass      = $class->getReflectionClass();
         $hasParentSet         = $reflectionClass->hasMethod('__set');
-        $parametersBuffer     = '';
+        $parametersBuffer     = '$name, $value';
         $returnTypeHint       = null;
 
 
         if ($hasParentSet) {
             $methodReflection = $reflectionClass->getMethod('__set');
             $parametersBuffer = $this->getMethodParametersWithTypes($methodReflection);
-            $returnTypeHint   = $this->getMethodReturnType($reflectionClass->getMethod('__set'));
+            $returnTypeHint   = $this->getMethodReturnType($methodReflection);
         }
 
         if (empty($lazyPublicProperties) && ! $hasParentSet) {
@@ -562,13 +562,13 @@ EOT;
         $lazyPublicProperties = array_keys($this->getLazyLoadedPublicProperties($class));
         $reflectionClass      = $class->getReflectionClass();
         $hasParentIsset       = $reflectionClass->hasMethod('__isset');
-        $parametersBuffer     = '';
+        $parametersBuffer     = '$name';
         $returnTypeHint       = null;
 
         if ($hasParentIsset) {
             $methodReflection = $reflectionClass->getMethod('__isset');
             $parametersBuffer = $this->getMethodParametersWithTypes($methodReflection);
-            $returnTypeHint   = $this->getMethodReturnType($reflectionClass->getMethod('__isset'));
+            $returnTypeHint   = $this->getMethodReturnType($methodReflection);
         }
 
         if (empty($lazyPublicProperties) && ! $hasParentIsset) {
