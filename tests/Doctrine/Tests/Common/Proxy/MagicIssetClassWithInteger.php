@@ -8,32 +8,32 @@ namespace Doctrine\Tests\Common\Proxy;
  */
 class MagicIssetClassWithInteger
 {
-	/**
-	 * @var string
-	 */
-	public $id = 'id';
+    /**
+     * @var string
+     */
+    public $id = 'id';
 
-	/**
-	 * @var string
-	 */
-	public $publicField = 'publicField';
+    /**
+     * @var string
+     */
+    public $publicField = 'publicField';
 
-	/**
-	 * @param string $name
-	 *
-	 * @return int
-	 * @throws \BadMethodCallException
-	 */
-	public function __isset(string $name): int
-	{
-		if ('test' === $name) {
-			return 1;
-		}
+    /**
+     * @param string $name
+     *
+     * @return int
+     * @throws \BadMethodCallException
+     */
+    public function __isset(string $name): int
+    {
+        if ('test' === $name) {
+            return 1;
+        }
 
-		if ('publicField' === $name || 'id' === $name) {
-			throw new \BadMethodCallException('Should never be called for "publicField" or "id"');
-		}
+        if ('publicField' === $name || 'id' === $name) {
+            throw new \BadMethodCallException('Should never be called for "publicField" or "id"');
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 }

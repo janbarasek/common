@@ -46,61 +46,61 @@ class ProxyMagicMethodsTest extends \PHPUnit\Framework\TestCase
     {
     }
 
-	public function testInheritedMagicGet()
-	{
-		$proxyClassName = $this->generateProxyClass(MagicGetClass::class);
-		$proxy          = new $proxyClassName(
-			function (Proxy $proxy, $method, $params) use (&$counter) {
-				if ( ! in_array($params[0], ['publicField', 'test', 'notDefined'])) {
-					throw new InvalidArgumentException('Unexpected access to field "' . $params[0] . '"');
-				}
+    public function testInheritedMagicGet()
+    {
+        $proxyClassName = $this->generateProxyClass(MagicGetClass::class);
+        $proxy          = new $proxyClassName(
+            function (Proxy $proxy, $method, $params) use (&$counter) {
+                if ( ! in_array($params[0], ['publicField', 'test', 'notDefined'])) {
+                    throw new InvalidArgumentException('Unexpected access to field "' . $params[0] . '"');
+                }
 
-				$initializer = $proxy->__getInitializer();
+                $initializer = $proxy->__getInitializer();
 
-				$proxy->__setInitializer(null);
+                $proxy->__setInitializer(null);
 
-				$proxy->publicField = 'modifiedPublicField';
-				$counter           += 1;
+                $proxy->publicField = 'modifiedPublicField';
+                $counter           += 1;
 
-				$proxy->__setInitializer($initializer);
-			}
-		);
+                $proxy->__setInitializer($initializer);
+            }
+        );
 
-		self::assertSame('id', $proxy->id);
-		self::assertSame('modifiedPublicField', $proxy->publicField);
-		self::assertSame('test', $proxy->test);
-		self::assertSame('not defined', $proxy->notDefined);
+        self::assertSame('id', $proxy->id);
+        self::assertSame('modifiedPublicField', $proxy->publicField);
+        self::assertSame('test', $proxy->test);
+        self::assertSame('not defined', $proxy->notDefined);
 
-		self::assertSame(3, $counter);
-	}
+        self::assertSame(3, $counter);
+    }
 
-	public function testInheritedMagicGetWithScalarType()
-	{
-		$proxyClassName = $this->generateProxyClass(MagicGetClassWithScalarType::class);
-		$proxy          = new $proxyClassName(
-			function (Proxy $proxy, $method, $params) use (&$counter) {
-				if ( ! in_array($params[0], ['publicField', 'test', 'notDefined'])) {
-					throw new InvalidArgumentException('Unexpected access to field "' . $params[0] . '"');
-				}
+    public function testInheritedMagicGetWithScalarType()
+    {
+        $proxyClassName = $this->generateProxyClass(MagicGetClassWithScalarType::class);
+        $proxy          = new $proxyClassName(
+            function (Proxy $proxy, $method, $params) use (&$counter) {
+                if ( ! in_array($params[0], ['publicField', 'test', 'notDefined'])) {
+                    throw new InvalidArgumentException('Unexpected access to field "' . $params[0] . '"');
+                }
 
-				$initializer = $proxy->__getInitializer();
+                $initializer = $proxy->__getInitializer();
 
-				$proxy->__setInitializer(null);
+                $proxy->__setInitializer(null);
 
-				$proxy->publicField = 'modifiedPublicField';
-				$counter           += 1;
+                $proxy->publicField = 'modifiedPublicField';
+                $counter           += 1;
 
-				$proxy->__setInitializer($initializer);
-			}
-		);
+                $proxy->__setInitializer($initializer);
+            }
+        );
 
-		self::assertSame('id', $proxy->id);
-		self::assertSame('modifiedPublicField', $proxy->publicField);
-		self::assertSame('test', $proxy->test);
-		self::assertSame('not defined', $proxy->notDefined);
+        self::assertSame('id', $proxy->id);
+        self::assertSame('modifiedPublicField', $proxy->publicField);
+        self::assertSame('test', $proxy->test);
+        self::assertSame('not defined', $proxy->notDefined);
 
-		self::assertSame(3, $counter);
-	}
+        self::assertSame(3, $counter);
+    }
 
     /**
      * @group DCOM-194
@@ -124,63 +124,63 @@ class ProxyMagicMethodsTest extends \PHPUnit\Framework\TestCase
         $undefined = $proxy->nonExisting;
     }
 
-	public function testInheritedMagicSet()
-	{
-		$proxyClassName = $this->generateProxyClass(MagicSetClass::class);
-		$proxy          = new $proxyClassName(
-			function (Proxy  $proxy, $method, $params) use (&$counter) {
-				if ( ! in_array($params[0], ['publicField', 'test', 'notDefined'])) {
-					throw new InvalidArgumentException('Unexpected access to field "' . $params[0] . '"');
-				}
+    public function testInheritedMagicSet()
+    {
+        $proxyClassName = $this->generateProxyClass(MagicSetClass::class);
+        $proxy          = new $proxyClassName(
+            function (Proxy  $proxy, $method, $params) use (&$counter) {
+                if ( ! in_array($params[0], ['publicField', 'test', 'notDefined'])) {
+                    throw new InvalidArgumentException('Unexpected access to field "' . $params[0] . '"');
+                }
 
-				$counter += 1;
-			}
-		);
+                $counter += 1;
+            }
+        );
 
-		self::assertSame('id', $proxy->id);
+        self::assertSame('id', $proxy->id);
 
-		$proxy->publicField = 'publicFieldValue';
+        $proxy->publicField = 'publicFieldValue';
 
-		self::assertSame('publicFieldValue', $proxy->publicField);
+        self::assertSame('publicFieldValue', $proxy->publicField);
 
-		$proxy->test = 'testValue';
+        $proxy->test = 'testValue';
 
-		self::assertSame('testValue', $proxy->testAttribute);
+        self::assertSame('testValue', $proxy->testAttribute);
 
-		$proxy->notDefined = 'not defined';
+        $proxy->notDefined = 'not defined';
 
-		self::assertSame('not defined', $proxy->testAttribute);
-		self::assertSame(3, $counter);
-	}
+        self::assertSame('not defined', $proxy->testAttribute);
+        self::assertSame(3, $counter);
+    }
 
-	public function testInheritedMagicSetWithScalarType()
-	{
-		$proxyClassName = $this->generateProxyClass(MagicSetClassWithScalarType::class);
-		$proxy          = new $proxyClassName(
-			function (Proxy  $proxy, $method, $params) use (&$counter) {
-				if ( ! in_array($params[0], ['publicField', 'test', 'notDefined'])) {
-					throw new InvalidArgumentException('Unexpected access to field "' . $params[0] . '"');
-				}
+    public function testInheritedMagicSetWithScalarType()
+    {
+        $proxyClassName = $this->generateProxyClass(MagicSetClassWithScalarType::class);
+        $proxy          = new $proxyClassName(
+            function (Proxy  $proxy, $method, $params) use (&$counter) {
+                if ( ! in_array($params[0], ['publicField', 'test', 'notDefined'])) {
+                    throw new InvalidArgumentException('Unexpected access to field "' . $params[0] . '"');
+                }
 
-				$counter += 1;
-			}
-		);
+                $counter += 1;
+            }
+        );
 
-		self::assertSame('id', $proxy->id);
+        self::assertSame('id', $proxy->id);
 
-		$proxy->publicField = 'publicFieldValue';
+        $proxy->publicField = 'publicFieldValue';
 
-		self::assertSame('publicFieldValue', $proxy->publicField);
+        self::assertSame('publicFieldValue', $proxy->publicField);
 
-		$proxy->test = 'testValue';
+        $proxy->test = 'testValue';
 
-		self::assertSame('testValue', $proxy->testAttribute);
+        self::assertSame('testValue', $proxy->testAttribute);
 
-		$proxy->notDefined = 'not defined';
+        $proxy->notDefined = 'not defined';
 
-		self::assertSame('not defined', $proxy->testAttribute);
-		self::assertSame(3, $counter);
-	}
+        self::assertSame('not defined', $proxy->testAttribute);
+        self::assertSame(3, $counter);
+    }
 
     public function testInheritedMagicSleep()
     {
@@ -220,95 +220,95 @@ class ProxyMagicMethodsTest extends \PHPUnit\Framework\TestCase
         self::assertSame('newPublicFieldValue', $unserialized->publicField, 'Proxy can still be initialized');
     }
 
-	public function testInheritedMagicIsset()
-	{
-		$proxyClassName = $this->generateProxyClass(MagicIssetClass::class);
-		$proxy          = new $proxyClassName(function (Proxy $proxy, $method, $params) use (&$counter) {
-			if (in_array($params[0], ['publicField', 'test', 'nonExisting'])) {
-				$initializer = $proxy->__getInitializer();
+    public function testInheritedMagicIsset()
+    {
+        $proxyClassName = $this->generateProxyClass(MagicIssetClass::class);
+        $proxy          = new $proxyClassName(function (Proxy $proxy, $method, $params) use (&$counter) {
+            if (in_array($params[0], ['publicField', 'test', 'nonExisting'])) {
+                $initializer = $proxy->__getInitializer();
 
-				$proxy->__setInitializer(null);
+                $proxy->__setInitializer(null);
 
-				$proxy->publicField = 'modifiedPublicField';
-				$counter           += 1;
+                $proxy->publicField = 'modifiedPublicField';
+                $counter           += 1;
 
-				$proxy->__setInitializer($initializer);
+                $proxy->__setInitializer($initializer);
 
-				return;
-			}
+                return;
+            }
 
-			throw new InvalidArgumentException(
-				sprintf('Should not be initialized when checking isset("%s")', $params[0])
-			);
-		});
+            throw new InvalidArgumentException(
+                sprintf('Should not be initialized when checking isset("%s")', $params[0])
+            );
+        });
 
-		self::assertTrue(isset($proxy->id));
-		self::assertTrue(isset($proxy->publicField));
-		self::assertTrue(isset($proxy->test));
-		self::assertFalse(isset($proxy->nonExisting));
+        self::assertTrue(isset($proxy->id));
+        self::assertTrue(isset($proxy->publicField));
+        self::assertTrue(isset($proxy->test));
+        self::assertFalse(isset($proxy->nonExisting));
 
-		self::assertSame(3, $counter);
-	}
+        self::assertSame(3, $counter);
+    }
 
-	public function testInheritedMagicIssetWithBoolean()
-	{
-		$proxyClassName = $this->generateProxyClass(MagicIssetClassWithBoolean::class);
-		$proxy          = new $proxyClassName(function (Proxy $proxy, $method, $params) use (&$counter) {
-			if (in_array($params[0], ['publicField', 'test', 'nonExisting'])) {
-				$initializer = $proxy->__getInitializer();
+    public function testInheritedMagicIssetWithBoolean()
+    {
+        $proxyClassName = $this->generateProxyClass(MagicIssetClassWithBoolean::class);
+        $proxy          = new $proxyClassName(function (Proxy $proxy, $method, $params) use (&$counter) {
+            if (in_array($params[0], ['publicField', 'test', 'nonExisting'])) {
+                $initializer = $proxy->__getInitializer();
 
-				$proxy->__setInitializer(null);
+                $proxy->__setInitializer(null);
 
-				$proxy->publicField = 'modifiedPublicField';
-				$counter           += 1;
+                $proxy->publicField = 'modifiedPublicField';
+                $counter           += 1;
 
-				$proxy->__setInitializer($initializer);
+                $proxy->__setInitializer($initializer);
 
-				return;
-			}
+                return;
+            }
 
-			throw new InvalidArgumentException(
-				sprintf('Should not be initialized when checking isset("%s")', $params[0])
-			);
-		});
+            throw new InvalidArgumentException(
+                sprintf('Should not be initialized when checking isset("%s")', $params[0])
+            );
+        });
 
-		self::assertTrue(isset($proxy->id));
-		self::assertTrue(isset($proxy->publicField));
-		self::assertTrue(isset($proxy->test));
-		self::assertFalse(isset($proxy->nonExisting));
+        self::assertTrue(isset($proxy->id));
+        self::assertTrue(isset($proxy->publicField));
+        self::assertTrue(isset($proxy->test));
+        self::assertFalse(isset($proxy->nonExisting));
 
-		self::assertSame(3, $counter);
-	}
+        self::assertSame(3, $counter);
+    }
 
-	public function testInheritedMagicIssetWithInteger()
-	{
-		$proxyClassName = $this->generateProxyClass(MagicIssetClassWithInteger::class);
-		$proxy          = new $proxyClassName(function (Proxy $proxy, $method, $params) use (&$counter) {
-			if (in_array($params[0], ['publicField', 'test', 'nonExisting'])) {
-				$initializer = $proxy->__getInitializer();
+    public function testInheritedMagicIssetWithInteger()
+    {
+        $proxyClassName = $this->generateProxyClass(MagicIssetClassWithInteger::class);
+        $proxy          = new $proxyClassName(function (Proxy $proxy, $method, $params) use (&$counter) {
+            if (in_array($params[0], ['publicField', 'test', 'nonExisting'])) {
+                $initializer = $proxy->__getInitializer();
 
-				$proxy->__setInitializer(null);
+                $proxy->__setInitializer(null);
 
-				$proxy->publicField = 'modifiedPublicField';
-				$counter           += 1;
+                $proxy->publicField = 'modifiedPublicField';
+                $counter           += 1;
 
-				$proxy->__setInitializer($initializer);
+                $proxy->__setInitializer($initializer);
 
-				return;
-			}
+                return;
+            }
 
-			throw new InvalidArgumentException(
-				sprintf('Should not be initialized when checking isset("%s")', $params[0])
-			);
-		});
+            throw new InvalidArgumentException(
+                sprintf('Should not be initialized when checking isset("%s")', $params[0])
+            );
+        });
 
-		self::assertTrue(isset($proxy->id));
-		self::assertTrue(isset($proxy->publicField));
-		self::assertTrue(isset($proxy->test));
-		self::assertFalse(isset($proxy->nonExisting));
+        self::assertTrue(isset($proxy->id));
+        self::assertTrue(isset($proxy->publicField));
+        self::assertTrue(isset($proxy->test));
+        self::assertFalse(isset($proxy->nonExisting));
 
-		self::assertSame(3, $counter);
-	}
+        self::assertSame(3, $counter);
+    }
 
     public function testInheritedMagicClone()
     {
