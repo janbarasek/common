@@ -981,10 +981,10 @@ EOT;
     {
         $buffer = '';
 
-        foreach ($reflectionMethod->getParameters() as $methodParameter) {
-            $typeHint = $this->getParameterType($methodParameter);
+        foreach ($reflectionMethod->getParameters() as $parameter) {
+            $typeHint = $this->getParameterType($parameter);
 
-            $buffer .= ($buffer ? ', ' : ' ') . ($typeHint ? $typeHint . ' ' : '') . '\$' . $methodParameter->getName();
+            $buffer .= ($buffer ? ', ' : ' ') . ($typeHint ? $typeHint . ' ' : '') . '$' . $parameter->getName();
         }
 
         return trim($buffer);
