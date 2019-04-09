@@ -102,6 +102,34 @@ class ProxyMagicMethodsTest extends \PHPUnit\Framework\TestCase
         self::assertSame(3, $counter);
     }
 
+    public function testInheritedMagicGetWithScalarTypeAndRenamedParameter()
+    {
+        $proxyClassName = $this->generateProxyClass(MagicGetClassWithScalarTypeAndRenamedParameter::class);
+        $proxy          = new $proxyClassName(
+            function (Proxy $proxy, $method, $params) use (&$counter) {
+                if ( ! in_array($params[0], ['publicField', 'test', 'notDefined'])) {
+                    throw new InvalidArgumentException('Unexpected access to field "' . $params[0] . '"');
+                }
+
+                $initializer = $proxy->__getInitializer();
+
+                $proxy->__setInitializer(null);
+
+                $proxy->publicField = 'modifiedPublicField';
+                $counter           += 1;
+
+                $proxy->__setInitializer($initializer);
+            }
+        );
+
+        self::assertSame('id', $proxy->id);
+        self::assertSame('modifiedPublicField', $proxy->publicField);
+        self::assertSame('test', $proxy->test);
+        self::assertSame('not defined', $proxy->notDefined);
+
+        self::assertSame(3, $counter);
+    }
+
     /**
      * @group DCOM-194
      */
