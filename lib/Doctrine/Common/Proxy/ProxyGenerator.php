@@ -433,7 +433,7 @@ EOT;
             }
 
             $parametersBuffer = $this->getMethodParametersWithTypes($methodReflection);
-            $returnTypeHint = $this->getMethodReturnType($methodReflection);
+            $returnTypeHint   = $this->getMethodReturnType($methodReflection);
         }
 
         if (empty($lazyPublicProperties) && ! $hasParentGet) {
