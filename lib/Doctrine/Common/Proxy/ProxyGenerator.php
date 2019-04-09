@@ -421,6 +421,7 @@ EOT;
         $returnReference      = '';
         $inheritDoc           = '';
         $parametersBuffer     = '$name';
+        $firstParameterName   = '$name';
         $returnTypeHint       = null;
 
         if ($reflectionClass->hasMethod('__get')) {
@@ -430,6 +431,11 @@ EOT;
 
             if ($methodReflection->returnsReference()) {
                 $returnReference = '& ';
+            }
+
+            $methodParameters = $methodReflection->getParameters();
+            if (isset($methodParameters[0])) {
+                $firstParameterName = '$' . $methodParameters[0]->getName();
             }
 
             $parametersBuffer = $this->getMethodParametersWithTypes($methodReflection);
@@ -443,7 +449,7 @@ EOT;
         $magicGet = <<<EOT
     /**
      * $inheritDoc
-     * @param string \$name
+     * @param string $firstParameterName
      */
     public function {$returnReference}__get($parametersBuffer)$returnTypeHint
     {
@@ -451,11 +457,11 @@ EOT;
 EOT;
 
         if ( ! empty($lazyPublicProperties)) {
-            $magicGet .= <<<'EOT'
-        if (array_key_exists($name, $this->__getLazyProperties())) {
-            $this->__initializer__ && $this->__initializer__->__invoke($this, '__get', [$name]);
+            $magicGet .= <<<EOT
+        if (array_key_exists($firstParameterName, \$this->__getLazyProperties())) {
+            \$this->__initializer__ && \$this->__initializer__->__invoke(\$this, '__get', [$firstParameterName]);
 
-            return $this->$name;
+            return \$this->$firstParameterName;
         }
 
 
@@ -463,15 +469,15 @@ EOT;
         }
 
         if ($hasParentGet) {
-            $magicGet .= <<<'EOT'
-        $this->__initializer__ && $this->__initializer__->__invoke($this, '__get', [$name]);
+            $magicGet .= <<<EOT
+        \$this->__initializer__ && \$this->__initializer__->__invoke(\$this, '__get', [$firstParameterName]);
 
-        return parent::__get($name);
+        return parent::__get($firstParameterName);
 
 EOT;
         } else {
-            $magicGet .= <<<'EOT'
-        trigger_error(sprintf('Undefined property: %s::$%s', __CLASS__, $name), E_USER_NOTICE);
+            $magicGet .= <<<EOT
+        trigger_error(sprintf('Undefined property: %s::$%s', __CLASS__, $firstParameterName), E_USER_NOTICE);
 
 EOT;
         }
