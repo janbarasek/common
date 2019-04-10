@@ -503,7 +503,6 @@ EOT;
         $parametersBuffer     = '$name, $value';
         $returnTypeHint       = null;
 
-
         if ($hasParentSet) {
             $methodReflection = $reflectionClass->getMethod('__set');
             $parametersBuffer = $this->buildParametersString($methodReflection->getParameters());
