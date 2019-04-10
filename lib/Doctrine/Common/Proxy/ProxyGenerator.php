@@ -438,7 +438,7 @@ EOT;
                 $firstParameterName = '$' . $methodParameters[0]->getName();
             }
 
-            $parametersBuffer = $this->getMethodParametersWithTypes($methodReflection);
+            $parametersBuffer = $this->buildParametersString($methodReflection->getParameters());
             $returnTypeHint   = $this->getMethodReturnType($methodReflection);
         }
 
@@ -506,7 +506,7 @@ EOT;
 
         if ($hasParentSet) {
             $methodReflection = $reflectionClass->getMethod('__set');
-            $parametersBuffer = $this->getMethodParametersWithTypes($methodReflection);
+            $parametersBuffer = $this->buildParametersString($methodReflection->getParameters());
             $returnTypeHint   = $this->getMethodReturnType($methodReflection);
         }
 
@@ -573,7 +573,7 @@ EOT;
 
         if ($hasParentIsset) {
             $methodReflection = $reflectionClass->getMethod('__isset');
-            $parametersBuffer = $this->getMethodParametersWithTypes($methodReflection);
+            $parametersBuffer = $this->buildParametersString($methodReflection->getParameters());
             $returnTypeHint   = $this->getMethodReturnType($methodReflection);
         }
 
@@ -976,24 +976,6 @@ EOT;
         }
 
         return $this->formatType($parameter->getType(), $parameter->getDeclaringFunction(), $parameter);
-    }
-
-    /**
-     * @param \ReflectionMethod $reflectionMethod
-     *
-     * @return string
-     */
-    private function getMethodParametersWithTypes(\ReflectionMethod $reflectionMethod): string
-    {
-        $buffer = '';
-
-        foreach ($reflectionMethod->getParameters() as $parameter) {
-            $typeHint = $this->getParameterType($parameter);
-
-            $buffer .= ($buffer ? ', ' : ' ') . ($typeHint ? $typeHint . ' ' : '') . '$' . $parameter->getName();
-        }
-
-        return trim($buffer);
     }
 
     /**
