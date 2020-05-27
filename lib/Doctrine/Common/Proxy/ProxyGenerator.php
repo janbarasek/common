@@ -411,7 +411,6 @@ EOT;
      * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata $class
      *
      * @return string
-     * @throws \ReflectionException
      */
     private function generateMagicGet(ClassMetadata $class)
     {
@@ -420,7 +419,7 @@ EOT;
         $hasParentGet         = false;
         $returnReference      = '';
         $inheritDoc           = '';
-        $parametersBuffer     = '$name';
+        $parametersString     = '$name';
         $firstParameterName   = '$name';
         $returnTypeHint       = null;
 
@@ -434,11 +433,9 @@ EOT;
             }
 
             $methodParameters = $methodReflection->getParameters();
-            if (isset($methodParameters[0])) {
-                $firstParameterName = '$' . $methodParameters[0]->getName();
-            }
+            $firstParameterName = '$' . $methodParameters[0]->getName();
 
-            $parametersBuffer = $this->buildParametersString($methodReflection->getParameters());
+            $parametersString = $this->buildParametersString($methodReflection->getParameters());
             $returnTypeHint   = $this->getMethodReturnType($methodReflection);
         }
 
@@ -446,18 +443,18 @@ EOT;
             return '';
         }
 
-        $magicGet = <<<EOT
+        $magicGet = <<<'EOT'
     /**
      * $inheritDoc
      * @param string $firstParameterName
      */
-    public function {$returnReference}__get($parametersBuffer)$returnTypeHint
+    public function {$returnReference}__get($parametersString)$returnTypeHint
     {
 
 EOT;
 
         if ( ! empty($lazyPublicProperties)) {
-            $magicGet .= <<<EOT
+            $magicGet .= <<<'EOT'
         if (array_key_exists($firstParameterName, \$this->__getLazyProperties())) {
             \$this->__initializer__ && \$this->__initializer__->__invoke(\$this, '__get', [$firstParameterName]);
 
@@ -469,14 +466,14 @@ EOT;
         }
 
         if ($hasParentGet) {
-            $magicGet .= <<<EOT
+            $magicGet .= <<<'EOT'
         \$this->__initializer__ && \$this->__initializer__->__invoke(\$this, '__get', [$firstParameterName]);
 
         return parent::__get($firstParameterName);
 
 EOT;
         } else {
-            $magicGet .= <<<EOT
+            $magicGet .= <<<'EOT'
         trigger_error(sprintf('Undefined property: %s::$%s', __CLASS__, $firstParameterName), E_USER_NOTICE);
 
 EOT;
@@ -493,19 +490,18 @@ EOT;
      * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata $class
      *
      * @return string
-     * @throws \ReflectionException
      */
     private function generateMagicSet(ClassMetadata $class)
     {
         $lazyPublicProperties = $this->getLazyLoadedPublicProperties($class);
         $reflectionClass      = $class->getReflectionClass();
         $hasParentSet         = $reflectionClass->hasMethod('__set');
-        $parametersBuffer     = '$name, $value';
+        $parametersString     = '$name, $value';
         $returnTypeHint       = null;
 
         if ($hasParentSet) {
             $methodReflection = $reflectionClass->getMethod('__set');
-            $parametersBuffer = $this->buildParametersString($methodReflection->getParameters());
+            $parametersString = $this->buildParametersString($methodReflection->getParameters());
             $returnTypeHint   = $this->getMethodReturnType($methodReflection);
         }
 
@@ -514,13 +510,13 @@ EOT;
         }
 
         $inheritDoc = $hasParentSet ? '{@inheritDoc}' : '';
-        $magicSet   = <<<EOT
+        $magicSet   = <<<'EOT'
     /**
      * $inheritDoc
      * @param string \$name
      * @param mixed  \$value
      */
-    public function __set($parametersBuffer)$returnTypeHint
+    public function __set($parametersString)$returnTypeHint
     {
 
 EOT;
@@ -560,19 +556,18 @@ EOT;
      * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata $class
      *
      * @return string
-     * @throws \ReflectionException
      */
     private function generateMagicIsset(ClassMetadata $class)
     {
         $lazyPublicProperties = array_keys($this->getLazyLoadedPublicProperties($class));
         $reflectionClass      = $class->getReflectionClass();
         $hasParentIsset       = $reflectionClass->hasMethod('__isset');
-        $parametersBuffer     = '$name';
+        $parametersString     = '$name';
         $returnTypeHint       = null;
 
         if ($hasParentIsset) {
             $methodReflection = $reflectionClass->getMethod('__isset');
-            $parametersBuffer = $this->buildParametersString($methodReflection->getParameters());
+            $parametersString = $this->buildParametersString($methodReflection->getParameters());
             $returnTypeHint   = $this->getMethodReturnType($methodReflection);
         }
 
@@ -581,14 +576,13 @@ EOT;
         }
 
         $inheritDoc = $hasParentIsset ? '{@inheritDoc}' : '';
-
-        $magicIsset = <<<EOT
+        $magicIsset = <<<'EOT'
     /**
      * $inheritDoc
      * @param  string \$name
      * @return boolean
      */
-    public function __isset($parametersBuffer)$returnTypeHint
+    public function __isset($parametersString)$returnTypeHint
     {
 
 EOT;
@@ -630,7 +624,7 @@ EOT;
     {
         $hasParentSleep = $class->getReflectionClass()->hasMethod('__sleep');
         $inheritDoc     = $hasParentSleep ? '{@inheritDoc}' : '';
-        $sleepImpl      = <<<EOT
+        $sleepImpl      = <<<'EOT'
     /**
      * $inheritDoc
      * @return array
@@ -680,7 +674,7 @@ EOT;
         $allProperties       = implode(', ', $allProperties);
         $protectedProperties = implode(', ', $protectedProperties);
 
-        return $sleepImpl . <<<EOT
+        return $sleepImpl . <<<'EOT'
         if (\$this->__isInitialized__) {
             return [$allProperties];
         }
@@ -708,7 +702,7 @@ EOT;
 
         $shortName  = $this->generateProxyShortClassName($class);
         $inheritDoc = $hasWakeup ? '{@inheritDoc}' : '';
-        $wakeupImpl = <<<EOT
+        $wakeupImpl = <<<'EOT'
     /**
      * $inheritDoc
      */
@@ -758,7 +752,7 @@ EOT;
         $inheritDoc      = $hasParentClone ? '{@inheritDoc}' : '';
         $callParentClone = $hasParentClone ? "\n        parent::__clone();\n" : '';
 
-        return <<<EOT
+        return <<<'EOT'
     /**
      * $inheritDoc
      */
