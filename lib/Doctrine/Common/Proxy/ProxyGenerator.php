@@ -469,7 +469,7 @@ EOT;
 
         if ( ! empty($lazyPublicProperties)) {
             $magicGet .= <<<EOT
-        if (\array_key_exists($name, \$this->__getLazyProperties())) {
+        if (\array_key_exists($name, self::\$lazyPropertiesNames)) {
             \$this->__initializer__ && \$this->__initializer__->__invoke(\$this, '__get', [$name]);
 
             return \$this->$name;
@@ -647,14 +647,14 @@ EOT;
 EOT;
 
         if ($hasParentSleep) {
-            return $sleepImpl . <<<EOT
-        \$properties = array_merge(['__isInitialized__'], parent::__sleep());
+            return $sleepImpl . <<<'EOT'
+        $properties = array_merge(['__isInitialized__'], parent::__sleep());
 
-        if (\$this->__isInitialized__) {
-            \$properties = array_diff(\$properties, array_keys(self::\$lazyPropertiesNames));
+        if ($this->__isInitialized__) {
+            $properties = array_diff($properties, array_keys(self::$lazyPropertiesNames));
         }
 
-        return \$properties;
+        return $properties;
     }
 EOT;
         }
