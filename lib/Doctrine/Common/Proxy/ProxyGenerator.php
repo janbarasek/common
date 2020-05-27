@@ -447,7 +447,7 @@ EOT;
             }
 
             $methodParameters = $methodReflection->getParameters();
-            $name = '$' . $methodParameters[0]->getName();
+            $name             = '$' . $methodParameters[0]->getName();
 
             $parametersString = $this->buildParametersString($methodReflection->getParameters());
             $returnTypeHint   = $this->getMethodReturnType($methodReflection);
