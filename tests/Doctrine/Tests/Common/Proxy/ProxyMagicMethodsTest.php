@@ -1,7 +1,7 @@
 <?php
 namespace Doctrine\Tests\Common\Proxy;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Proxy\Proxy;
 use Doctrine\Common\Proxy\ProxyGenerator;
 use InvalidArgumentException;
@@ -37,12 +37,12 @@ class ProxyMagicMethodsTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritDoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->proxyGenerator = new ProxyGenerator(__DIR__ . '/generated', __NAMESPACE__ . '\\MagicMethodProxy');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
     }
 

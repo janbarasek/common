@@ -1,7 +1,7 @@
 <?php
 namespace Doctrine\Tests\Common\Proxy;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Proxy\Proxy;
 use Doctrine\Common\Proxy\ProxyGenerator;
 use stdClass;
@@ -37,7 +37,7 @@ class ProxyLogicVoidReturnTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritDoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->proxyLoader                = $loader      = $this->getMockBuilder(stdClass::class)->setMethods(['load'])->getMock();
         $this->initializerCallbackMock    = $this->getMockBuilder(stdClass::class)->setMethods(['__invoke'])->getMock();
