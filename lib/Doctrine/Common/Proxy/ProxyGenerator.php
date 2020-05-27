@@ -420,7 +420,6 @@ EOT;
         $returnReference      = '';
         $inheritDoc           = '';
         $parametersString     = '$name';
-        $firstParameterName   = '$name';
         $returnTypeHint       = null;
 
         if ($reflectionClass->hasMethod('__get')) {
@@ -433,7 +432,7 @@ EOT;
             }
 
             $methodParameters = $methodReflection->getParameters();
-            $firstParameterName = '$' . $methodParameters[0]->getName();
+            $name = '$' . $methodParameters[0]->getName();
 
             $parametersString = $this->buildParametersString($methodReflection->getParameters());
             $returnTypeHint   = $this->getMethodReturnType($methodReflection);
@@ -446,7 +445,7 @@ EOT;
         $magicGet = <<<'EOT'
     /**
      * $inheritDoc
-     * @param string $firstParameterName
+     * @param string $name
      */
     public function {$returnReference}__get($parametersString)$returnTypeHint
     {
@@ -455,10 +454,10 @@ EOT;
 
         if ( ! empty($lazyPublicProperties)) {
             $magicGet .= <<<'EOT'
-        if (array_key_exists($firstParameterName, \$this->__getLazyProperties())) {
-            \$this->__initializer__ && \$this->__initializer__->__invoke(\$this, '__get', [$firstParameterName]);
+        if (array_key_exists($name, \$this->__getLazyProperties())) {
+            $this->__initializer__ && \$this->__initializer__->__invoke(\$this, '__get', [$name]);
 
-            return \$this->$firstParameterName;
+            return \$this->$name;
         }
 
 
@@ -467,14 +466,14 @@ EOT;
 
         if ($hasParentGet) {
             $magicGet .= <<<'EOT'
-        \$this->__initializer__ && \$this->__initializer__->__invoke(\$this, '__get', [$firstParameterName]);
+        $this->__initializer__ && \$this->__initializer__->__invoke(\$this, '__get', [$name]);
 
-        return parent::__get($firstParameterName);
+        return parent::__get($name);
 
 EOT;
         } else {
             $magicGet .= <<<'EOT'
-        trigger_error(sprintf('Undefined property: %s::$%s', __CLASS__, $firstParameterName), E_USER_NOTICE);
+        trigger_error(sprintf('Undefined property: %s::$%s', __CLASS__, $name), E_USER_NOTICE);
 
 EOT;
         }
@@ -493,14 +492,13 @@ EOT;
      */
     private function generateMagicSet(ClassMetadata $class)
     {
-        $lazyPublicProperties = $this->getLazyLoadedPublicProperties($class);
-        $reflectionClass      = $class->getReflectionClass();
-        $hasParentSet         = $reflectionClass->hasMethod('__set');
+        $lazyPublicProperties = $this->getLazyLoadedPublicPropertiesNames($class);
+        $hasParentSet         = $class->getReflectionClass()->hasMethod('__set');
         $parametersString     = '$name, $value';
         $returnTypeHint       = null;
 
         if ($hasParentSet) {
-            $methodReflection = $reflectionClass->getMethod('__set');
+            $methodReflection = $class->getReflectionClass()->getMethod('__set');
             $parametersString = $this->buildParametersString($methodReflection->getParameters());
             $returnTypeHint   = $this->getMethodReturnType($methodReflection);
         }
@@ -559,14 +557,13 @@ EOT;
      */
     private function generateMagicIsset(ClassMetadata $class)
     {
-        $lazyPublicProperties = array_keys($this->getLazyLoadedPublicProperties($class));
-        $reflectionClass      = $class->getReflectionClass();
-        $hasParentIsset       = $reflectionClass->hasMethod('__isset');
+        $lazyPublicProperties = $this->getLazyLoadedPublicPropertiesNames($class);
+        $hasParentIsset       = $class->getReflectionClass()->hasMethod('__isset');
         $parametersString     = '$name';
         $returnTypeHint       = null;
 
         if ($hasParentIsset) {
-            $methodReflection = $reflectionClass->getMethod('__isset');
+            $methodReflection = $class->getReflectionClass()->getMethod('__isset');
             $parametersString = $this->buildParametersString($methodReflection->getParameters());
             $returnTypeHint   = $this->getMethodReturnType($methodReflection);
         }
