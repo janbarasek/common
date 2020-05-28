@@ -152,8 +152,8 @@ class ProxyMagicMethodsTest extends \PHPUnit\Framework\TestCase
             );
         });
 
-        self::assertSame(null, $proxy->publicField);
-        self::assertSame(null, $proxy->test);
+        self::assertNull($proxy->publicField);
+        self::assertNull($proxy->test);
 
         self::assertSame(2, $counter);
     }
