@@ -1,10 +1,10 @@
 <?php
 namespace Doctrine\Common\Proxy;
 
-use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Doctrine\Common\Proxy\Exception\UnexpectedValueException;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use function array_map;
 use function method_exists;
 
@@ -468,34 +468,35 @@ EOT;
 EOT;
 
         if ( ! empty($lazyPublicProperties)) {
-            $magicGet .= <<<EOT
-        if (\array_key_exists($name, self::\$lazyPropertiesNames)) {
-            \$this->__initializer__ && \$this->__initializer__->__invoke(\$this, '__get', [$name]);
+            $magicGet .= sprintf(<<<'EOT'
+        if (\array_key_exists(%s, self::$lazyPropertiesNames)) {
+            $this->__initializer__ && $this->__initializer__->__invoke($this, '__get', [%s]);
 
-            return \$this->$name;
+            return $this->%s;
         }
 
 
-EOT;
+EOT
+                , $name, $name, $name);
         }
 
         if ($hasParentGet) {
-            $magicGet .= <<<EOT
-        \$this->__initializer__ && \$this->__initializer__->__invoke(\$this, '__get', [$name]);
+            $magicGet .= sprintf(<<<'EOT'
+        $this->__initializer__ && $this->__initializer__->__invoke($this, '__get', [%s]);
 
-        return parent::__get($name);
+        return parent::__get(%s);
 
-EOT;
+EOT
+                , $name, $name);
         } else {
-            $magicGet .= <<<EOT
-        trigger_error(sprintf('Undefined property: %s::$%s', __CLASS__, $name), E_USER_NOTICE);
+            $magicGet .= sprintf(<<<EOT
+        trigger_error(sprintf('Undefined property: %%s::$%%s', __CLASS__, %s), E_USER_NOTICE);
 
-EOT;
+EOT
+                , $name);
         }
 
-        $magicGet .= "    }";
-
-        return $magicGet;
+        return $magicGet . "    }";
     }
 
     /**
@@ -523,16 +524,17 @@ EOT;
         }
 
         $inheritDoc = $hasParentSet ? '{@inheritDoc}' : '';
-        $magicSet   = <<<EOT
+        $magicSet   = sprintf(<<<'EOT'
     /**
-     * $inheritDoc
-     * @param string \$name
-     * @param mixed  \$value
+     * %s
+     * @param string $name
+     * @param mixed  $value
      */
-    public function __set($parametersString)$returnTypeHint
+    public function __set(%s)%s
     {
 
-EOT;
+EOT
+            , $inheritDoc, $parametersString, $returnTypeHint);
 
         if ( ! empty($lazyPublicProperties)) {
             $magicSet .= <<<'EOT'
@@ -558,9 +560,7 @@ EOT;
             $magicSet .= "        \$this->\$name = \$value;";
         }
 
-        $magicSet .= "\n    }";
-
-        return $magicSet;
+        return $magicSet . "\n    }";
     }
 
     /**
