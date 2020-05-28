@@ -5,12 +5,9 @@ use ReflectionClass;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 
 /**
- * Class metadata test asset for @see LazyLoadableObject
- *
- * @author Marco Pivetta <ocramius@gmail.com>
- * @since  2.4
+ * Class metadata test asset for @see LazyLoadableObjectWithTypedProperties
  */
-class LazyLoadableObjectClassMetadata implements ClassMetadata
+class LazyLoadableObjectWithTypedPropertiesClassMetadata implements ClassMetadata
 {
     /**
      * @var ReflectionClass
@@ -65,7 +62,7 @@ class LazyLoadableObjectClassMetadata implements ClassMetadata
     public function getReflectionClass()
     {
         if (null === $this->reflectionClass) {
-            $this->reflectionClass = new \ReflectionClass(__NAMESPACE__ . '\LazyLoadableObject');
+            $this->reflectionClass = new \ReflectionClass(__NAMESPACE__ . '\LazyLoadableObjectWithTypedProperties');
         }
 
         return $this->reflectionClass;
