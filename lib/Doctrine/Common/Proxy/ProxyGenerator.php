@@ -471,23 +471,43 @@ EOT;
             $magicGet .= sprintf(<<<'EOT'
         if (\array_key_exists(%s, self::$lazyPropertiesNames)) {
             $this->__initializer__ && $this->__initializer__->__invoke($this, '__get', [%s]);
+EOT
+                , $name, $name);
 
-            return $this->%s;
+            if ($returnTypeHint === ': void') {
+                $magicGet .= "\n            return;";
+            } else {
+                $magicGet .= "\n            return \$this->$name;";
+            }
+
+            $magicGet .= <<<'EOT'
+
         }
 
 
-EOT
-                , $name, $name, $name);
+EOT;
         }
 
         if ($hasParentGet) {
             $magicGet .= sprintf(<<<'EOT'
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__get', [%s]);
+EOT
+                , $name);
+
+            if ($returnTypeHint === ': void') {
+                $magicGet .= sprintf(<<<'EOT'
+
+        parent::__get(%s);
+        return;
+EOT
+                    , $name);
+            } else {
+                $magicGet .= sprintf(<<<'EOT'
 
         return parent::__get(%s);
-
 EOT
-                , $name, $name);
+                    , $name);
+            }
         } else {
             $magicGet .= sprintf(<<<EOT
         trigger_error(sprintf('Undefined property: %%s::$%%s', __CLASS__, %s), E_USER_NOTICE);
@@ -496,7 +516,7 @@ EOT
                 , $name);
         }
 
-        return $magicGet . "    }";
+        return $magicGet . "\n    }";
     }
 
     /**
@@ -616,7 +636,6 @@ EOT;
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__isset', [$name]);
 
         return parent::__isset($name);
-
 EOT;
         } else {
             $magicIsset .= "        return false;";

@@ -130,6 +130,34 @@ class ProxyMagicMethodsTest extends \PHPUnit\Framework\TestCase
         self::assertSame(3, $counter);
     }
 
+    public function testInheritedMagicGetWithVoid()
+    {
+        $proxyClassName = $this->generateProxyClass(MagicGetClassWithVoid::class);
+        $proxy          = new $proxyClassName(function (Proxy $proxy, $method, $params) use (&$counter) {
+            if (in_array($params[0], ['publicField', 'test'])) {
+                $initializer = $proxy->__getInitializer();
+
+                $proxy->__setInitializer(null);
+
+                $proxy->publicField = 'modifiedPublicField';
+                $counter           += 1;
+
+                $proxy->__setInitializer($initializer);
+
+                return;
+            }
+
+            throw new InvalidArgumentException(
+                sprintf('Should not be initialized when checking isset("%s")', $params[0])
+            );
+        });
+
+        self::assertSame(null, $proxy->publicField);
+        self::assertSame(null, $proxy->test);
+
+        self::assertSame(2, $counter);
+    }
+
     /**
      * @group DCOM-194
      */
